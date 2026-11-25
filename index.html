@@ -1,0 +1,1931 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#EDEFF2" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#090B0E" media="(prefers-color-scheme: dark)">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="D-MAX">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>D-MAX Control</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    // สร้างไอคอน Apple Touch Icon และ Web App Manifest แบบออฟไลน์ด้วย Canvas
+    (function () {
+      try {
+        function rrect(ctx, px, py, pw, ph, pr) {
+          ctx.beginPath();
+          ctx.moveTo(px + pr, py);
+          ctx.arcTo(px + pw, py, px + pw, py + ph, pr);
+          ctx.arcTo(px + pw, py + ph, px, py + ph, pr);
+          ctx.arcTo(px, py + ph, px, py, pr);
+          ctx.arcTo(px, py, px + pw, py, pr);
+          ctx.closePath();
+        }
+
+        function icon(n) {
+          const c = document.createElement("canvas");
+          c.width = c.height = n;
+          const x = c.getContext("2d");
+
+          const bg = x.createLinearGradient(0, 0, n, n);
+          bg.addColorStop(0, "#FF453A");
+          bg.addColorStop(0.55, "#E4002B");
+          bg.addColorStop(1, "#8E0018");
+          x.fillStyle = bg;
+          x.fillRect(0, 0, n, n);
+
+          const sheen = x.createRadialGradient(n * 0.25, n * 0.18, n * 0.04, n * 0.35, n * 0.25, n * 0.85);
+          sheen.addColorStop(0, "rgba(255,255,255,0.28)");
+          sheen.addColorStop(1, "rgba(255,255,255,0)");
+          x.fillStyle = sheen;
+          x.fillRect(0, 0, n, n);
+
+          x.strokeStyle = "rgba(255,255,255,0.22)";
+          x.lineWidth = Math.max(2, n * 0.024);
+          rrect(x, n * 0.04, n * 0.04, n * 0.92, n * 0.92, n * 0.21);
+          x.stroke();
+
+          const cx = n * 0.48;
+          const cy = n * 0.52;
+          const sw = n * 0.42;
+          const sh = n * 0.48;
+          x.save();
+          x.shadowColor = "rgba(40,0,6,0.45)";
+          x.shadowBlur = n * 0.08;
+          x.shadowOffsetY = n * 0.03;
+          x.beginPath();
+          x.moveTo(cx, cy - sh * 0.52);
+          x.quadraticCurveTo(cx + sw * 0.52, cy - sh * 0.42, cx + sw * 0.50, cy - sh * 0.05);
+          x.quadraticCurveTo(cx + sw * 0.44, cy + sh * 0.34, cx, cy + sh * 0.54);
+          x.quadraticCurveTo(cx - sw * 0.44, cy + sh * 0.34, cx - sw * 0.50, cy - sh * 0.05);
+          x.quadraticCurveTo(cx - sw * 0.52, cy - sh * 0.42, cx, cy - sh * 0.52);
+          x.closePath();
+
+          const sg = x.createLinearGradient(0, cy - sh * 0.5, 0, cy + sh * 0.5);
+          sg.addColorStop(0, "#FFFFFF");
+          sg.addColorStop(1, "#F2F2F7");
+          x.fillStyle = sg;
+          x.fill();
+          x.restore();
+
+          x.strokeStyle = "#C7001E";
+          x.lineWidth = Math.max(2.5, n * 0.042);
+          x.lineCap = "round";
+          x.lineJoin = "round";
+          x.beginPath();
+          x.moveTo(cx - sw * 0.18, cy + sh * 0.02);
+          x.lineTo(cx - sw * 0.04, cy + sh * 0.16);
+          x.lineTo(cx + sw * 0.21, cy - sh * 0.12);
+          x.stroke();
+
+          x.strokeStyle = "rgba(255,255,255,0.85)";
+          x.lineWidth = Math.max(2, n * 0.032);
+          x.beginPath();
+          x.arc(cx + sw * 0.54, cy, sh * 0.22, -0.55, 0.55);
+          x.stroke();
+
+          x.fillStyle = "#30D158";
+          x.beginPath();
+          x.arc(n * 0.79, n * 0.21, n * 0.065, 0, Math.PI * 2);
+          x.fill();
+
+          x.strokeStyle = "rgba(255,255,255,0.85)";
+          x.lineWidth = Math.max(1.5, n * 0.016);
+          x.stroke();
+
+          return c.toDataURL("image/png");
+        }
+
+        const i180 = icon(180);
+        const i192 = icon(192);
+        const i512 = icon(512);
+
+        const appleIcon = document.createElement("link");
+        appleIcon.rel = "apple-touch-icon";
+        appleIcon.href = i180;
+        document.head.appendChild(appleIcon);
+
+        const baseUrl = location.href.split("#")[0];
+        const manifest = {
+          name: "D-MAX Control",
+          short_name: "D-MAX",
+          start_url: baseUrl,
+          scope: baseUrl,
+          display: "standalone",
+          orientation: "portrait",
+          background_color: "#12151b",
+          theme_color: "#12151b",
+          icons: [
+            { src: i192, sizes: "192x192", type: "image/png", purpose: "any maskable" },
+            { src: i512, sizes: "512x512", type: "image/png", purpose: "any maskable" }
+          ]
+        };
+
+        const manifestLink = document.createElement("link");
+        manifestLink.rel = "manifest";
+        manifestLink.href = "data:application/manifest+json," + encodeURIComponent(JSON.stringify(manifest));
+        document.head.appendChild(manifestLink);
+      } catch (_) {}
+    })();
+  </script>
+  <style>
+    :root {
+      --bg: #EDEFF2;
+      --card: #FFFFFF;
+      --soft: #F3F4F7;
+      --line: #E2E5EA;
+      --text: #14181F;
+      --mute: #6B7480;
+      --accent: #E4002B;
+      --on: #FFFFFF;
+      --ok: #1FA862;
+      --warn: #E08A00;
+      --bad: #FF3B53;
+      --info: #2F6FED;
+      --shadow: 0 1px 2px rgba(20, 24, 31, .05), 0 8px 24px -12px rgba(20, 24, 31, .14);
+      color-scheme: light;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      :root:not([data-theme="light"]) {
+        --bg: #090B0E;
+        --card: #14181E;
+        --soft: #1B2027;
+        --line: #262C35;
+        --text: #EEF1F5;
+        --mute: #8C95A1;
+        --accent: #FF3B53;
+        --on: #FFFFFF;
+        --ok: #35D488;
+        --warn: #FFB020;
+        --bad: #FF3B53;
+        --info: #5B93FF;
+        --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 10px 30px -12px rgba(0, 0, 0, .7);
+        color-scheme: dark;
+      }
+    }
+
+    :root[data-theme="dark"] {
+      --bg: #090B0E;
+      --card: #14181E;
+      --soft: #1B2027;
+      --line: #262C35;
+      --text: #EEF1F5;
+      --mute: #8C95A1;
+      --accent: #FF3B53;
+      --on: #FFFFFF;
+      --ok: #35D488;
+      --warn: #FFB020;
+      --bad: #FF3B53;
+      --info: #5B93FF;
+      --shadow: 0 1px 0 rgba(255, 255, 255, .03) inset, 0 10px 30px -12px rgba(0, 0, 0, .7);
+      color-scheme: dark;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-padding-top: calc(64px + env(safe-area-inset-top, 0px));
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--text);
+      font: 400 15px/1.5 -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", "Noto Sans Thai", sans-serif;
+      -webkit-font-smoothing: antialiased;
+      padding-top: env(safe-area-inset-top, 0px);
+      padding-bottom: calc(120px + env(safe-area-inset-bottom, 0px));
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0 0 auto;
+      height: env(safe-area-inset-top, 0px);
+      background: var(--bg);
+      z-index: 40;
+    }
+
+    button,
+    input {
+      font: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    button:disabled {
+      opacity: 0.45;
+      cursor: not-allowed;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--info);
+      outline-offset: 2px;
+    }
+
+    .w {
+      max-width: 560px;
+      margin: 0 auto;
+      padding: 0 16px;
+    }
+
+    .top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 0 14px;
+      gap: 10px;
+    }
+
+    .title-row {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .title-key {
+      width: 28px;
+      height: 28px;
+      border-radius: 9px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+      color: var(--accent);
+      background: color-mix(in srgb, var(--accent) 13%, transparent);
+      border: 1px solid color-mix(in srgb, var(--accent) 26%, transparent);
+    }
+
+    .title-key svg {
+      width: 17px;
+      height: 17px;
+      display: block;
+    }
+
+    .top h1 {
+      margin: 0;
+      font-size: 21px;
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+
+    .top small {
+      display: block;
+      color: var(--mute);
+      font-size: 12.5px;
+      margin-top: 1px;
+    }
+
+    .top .acts {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .ib {
+      height: 38px;
+      min-width: 38px;
+      padding: 0 12px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: var(--card);
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: var(--shadow);
+      transition: transform .1s ease, background .15s ease, border-color .15s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .ib:active:not(:disabled) {
+      transform: scale(.95);
+    }
+
+    .ib.ble-active {
+      border-color: color-mix(in srgb, var(--ok) 60%, var(--line));
+      background: color-mix(in srgb, var(--ok) 14%, var(--card));
+      color: var(--ok);
+      font-weight: 600;
+    }
+
+    .ib.ble-disc {
+      color: var(--bad);
+      border-color: color-mix(in srgb, var(--bad) 45%, var(--line));
+    }
+
+    .hero {
+      --c: var(--ok);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 20px;
+      border-radius: 28px;
+      color: #FFFFFF;
+      background: radial-gradient(120% 90% at 85% 0, #2a303b 0, #12151b 55%, #0a0c10 100%);
+      box-shadow: var(--shadow);
+    }
+
+    .hero:before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(115deg, rgba(255, 255, 255, .025) 0 2px, transparent 2px 9px);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 6px;
+      background: var(--c);
+      transition: background .2s ease;
+    }
+
+    .hero[data-s="armed"] {
+      --c: var(--warn);
+    }
+
+    .hero[data-s="alarm"] {
+      --c: var(--bad);
+    }
+
+    .dial {
+      position: relative;
+      flex: none;
+      width: 92px;
+      height: 92px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      color: var(--c);
+      background: #0b0d11;
+      box-shadow: inset 0 0 0 3px var(--c), 0 0 26px -5px var(--c);
+      transition: box-shadow .2s ease, color .2s ease;
+      will-change: transform;
+    }
+
+    .key-svg {
+      width: 42px;
+      height: 42px;
+      display: block;
+      transition: transform .2s ease;
+    }
+
+    .hero[data-s="alarm"] .dial {
+      animation: beat .6s infinite alternate;
+    }
+
+    .hero[data-s="alarm"] .key-svg {
+      transform: scale(1.06);
+    }
+
+    @keyframes beat {
+      to {
+        transform: scale(1.05);
+      }
+    }
+
+    .hero > div:last-child {
+      position: relative;
+      min-width: 0;
+    }
+
+    .hero small {
+      color: rgba(255, 255, 255, .62);
+      font-size: 12.5px;
+    }
+
+    .hero h2 {
+      margin: 2px 0 4px;
+      font-size: 22px;
+      font-weight: 600;
+      line-height: 1.25;
+      color: var(--c);
+    }
+
+    .hero p {
+      margin: 0;
+      color: rgba(255, 255, 255, .6);
+      font-size: 12.5px;
+    }
+
+    .hero b {
+      color: #FFFFFF;
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .tiles {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .tile {
+      --c: var(--ok);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 11px 8px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      transition: border-color .2s ease;
+    }
+
+    .tile[data-s="warn"] {
+      --c: var(--warn);
+    }
+
+    .tile[data-s="bad"] {
+      --c: var(--bad);
+    }
+
+    .tile span {
+      display: block;
+      font-size: 11.5px;
+      color: var(--mute);
+    }
+
+    .tile b {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      margin-top: 4px;
+      font-size: 13.5px;
+      font-weight: 600;
+      color: var(--c);
+    }
+
+    .lamp-ico {
+      width: 14px;
+      height: 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex: none;
+    }
+
+    .lamp-ico svg {
+      width: 14px;
+      height: 14px;
+      display: block;
+    }
+
+    .tabs {
+      position: sticky;
+      top: env(safe-area-inset-top, 0px);
+      z-index: 30;
+      background: var(--bg);
+      padding: 14px 0 12px;
+    }
+
+    .seg {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 4px;
+      background: var(--soft);
+      padding: 4px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+    }
+
+    .seg button {
+      border: 0;
+      background: transparent;
+      color: var(--mute);
+      border-radius: 10px;
+      padding: 9px 2px;
+      font-size: 13px;
+      font-weight: 500;
+      transition: background .15s ease, color .15s ease;
+    }
+
+    .seg button[aria-selected="true"] {
+      background: var(--accent);
+      color: var(--on);
+      font-weight: 600;
+    }
+
+    .pn {
+      display: none;
+    }
+
+    .pn.on {
+      display: block;
+    }
+
+    .g {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      margin-bottom: 14px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    .g h3 {
+      margin: 0;
+      padding: 14px 16px 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--mute);
+    }
+
+    .r {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 12px 16px;
+      border-top: 1px solid var(--line);
+    }
+
+    .g h3 + .r {
+      border-top: 0;
+    }
+
+    .r > div:first-child {
+      min-width: 0;
+    }
+
+    .r b {
+      display: block;
+      font-size: 14.5px;
+      font-weight: 500;
+      line-height: 1.35;
+    }
+
+    .r small {
+      display: block;
+      margin-top: 2px;
+      color: var(--mute);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+
+    .st {
+      display: flex;
+      align-items: center;
+      flex: none;
+      background: var(--soft);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+    }
+
+    .st:focus-within {
+      border-color: var(--info);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--info) 22%, transparent);
+    }
+
+    .st button {
+      width: 36px;
+      height: 46px;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font-size: 22px;
+      line-height: 1;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .st .v {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      width: 60px;
+    }
+
+    .st input {
+      width: 100%;
+      border: 0;
+      background: transparent;
+      text-align: center;
+      font-size: 16.5px;
+      font-weight: 600;
+      padding: 0;
+      font-variant-numeric: tabular-nums;
+      -moz-appearance: textfield;
+    }
+
+    .st input::-webkit-inner-spin-button,
+    .st input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+    }
+
+    .st input:focus {
+      outline: 0;
+    }
+
+    .st u {
+      text-decoration: none;
+      font-size: 10.5px;
+      color: var(--mute);
+      margin-top: -2px;
+    }
+
+    .sw {
+      position: relative;
+      width: 51px;
+      height: 31px;
+      flex: none;
+    }
+
+    .sw input {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    .sw i {
+      position: absolute;
+      inset: 0;
+      border-radius: 999px;
+      background: color-mix(in srgb, var(--mute) 35%, transparent);
+      transition: background .2s ease;
+      pointer-events: none;
+    }
+
+    .sw i::after {
+      content: "";
+      position: absolute;
+      left: 2px;
+      top: 2px;
+      width: 27px;
+      height: 27px;
+      border-radius: 50%;
+      background: #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+      transition: transform .22s ease;
+    }
+
+    .sw input:checked + i {
+      background: var(--ok);
+    }
+
+    .sw input:checked + i::after {
+      transform: translateX(20px);
+    }
+
+    .sw input:focus-visible + i {
+      outline: 2px solid var(--info);
+      outline-offset: 2px;
+    }
+
+    .f {
+      padding: 10px 16px 14px;
+      border-top: 1px solid var(--line);
+    }
+
+    .g h3 + .f {
+      border-top: 0;
+    }
+
+    .f label {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 13px;
+      color: var(--mute);
+    }
+
+    .in {
+      width: 100%;
+      background: var(--soft);
+      border: 1px solid transparent;
+      border-radius: 14px;
+      padding: 12px 14px;
+      font-size: 16px;
+    }
+
+    .in:focus {
+      outline: 0;
+      border-color: var(--info);
+      box-shadow: 0 0 0 3px color-mix(in srgb, var(--info) 25%, transparent);
+    }
+
+    .btn {
+      border: 0;
+      border-radius: 16px;
+      padding: 13px 18px;
+      font-size: 15px;
+      font-weight: 600;
+      background: var(--accent);
+      color: var(--on);
+      box-shadow: 0 10px 24px -8px var(--accent);
+      transition: transform .1s ease;
+    }
+
+    .btn:active:not(:disabled) {
+      transform: scale(.98);
+    }
+
+    .btn.s {
+      background: var(--soft);
+      color: var(--text);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .btn.d {
+      width: 100%;
+      background: transparent;
+      color: var(--accent);
+      border: 1px solid var(--line);
+      box-shadow: none;
+    }
+
+    .bar {
+      position: fixed;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 35;
+      padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px));
+      background: var(--card);
+      border-top: 1px solid var(--line);
+      transform: translateY(115%);
+      transition: transform .2s ease;
+    }
+
+    .bar.on {
+      transform: none;
+    }
+
+    .bar > div {
+      max-width: 560px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .bar span {
+      flex: 1;
+      font-size: 13px;
+      color: var(--mute);
+    }
+
+    .foot {
+      margin: 26px 0 0;
+      text-align: center;
+      color: var(--mute);
+      font-size: 12px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      top: calc(10px + env(safe-area-inset-top, 0px));
+      z-index: 90;
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      max-width: calc(100vw - 28px);
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: #0E1116;
+      color: #FFFFFF;
+      font-size: 13px;
+      font-weight: 500;
+      box-shadow: 0 14px 34px rgba(0, 0, 0, .35);
+      transform: translate(-50%, -80px);
+      opacity: 0;
+      transition: transform .28s ease, opacity .2s ease;
+      pointer-events: none;
+    }
+
+    .toast.show {
+      transform: translate(-50%, 0);
+      opacity: 1;
+    }
+
+    .toast i {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--ok);
+      flex: none;
+    }
+
+    .toast.err i {
+      background: var(--accent);
+    }
+
+    .mb {
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0, 0, 0, .58);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .mb.open {
+      display: flex;
+    }
+
+    .mbox {
+      width: 100%;
+      max-width: 330px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      padding: 22px;
+      text-align: center;
+      box-shadow: var(--shadow);
+    }
+
+    .mbox h3 {
+      margin: 8px 0 6px;
+      font-size: 17px;
+    }
+
+    .mbox p {
+      margin: 0;
+      color: var(--mute);
+      font-size: 13px;
+    }
+
+    .mact {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .mact button {
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      background: var(--soft);
+      color: var(--text);
+      font: 600 14px inherit;
+    }
+
+    .mact .go {
+      background: var(--accent);
+      border-color: transparent;
+      color: #FFFFFF;
+    }
+
+    @media (max-width: 400px) {
+      .dial {
+        width: 80px;
+        height: 80px;
+      }
+
+      .key-svg {
+        width: 36px;
+        height: 36px;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      * {
+        animation: none !important;
+        transition: none !important;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- กล่องแจ้งเตือน Toast -->
+  <div id="toast" class="toast" role="status" aria-live="polite">
+    <i></i>
+    <span id="toastText"></span>
+  </div>
+
+  <!-- หน้าควบคุมและตั้งค่าหลัก -->
+  <main class="w">
+    <header class="top">
+      <div>
+        <div class="title-row">
+          <span class="title-key" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="8.5" cy="12" r="4.5" stroke="currentColor" stroke-width="2" />
+              <path d="M13 12H20.5M17.5 12V15M20.5 12V14.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <h1>D-MAX Control</h1>
+        </div>
+        <small id="bleSubtitle">ผู้ใช้ <b id="user">admin</b> · BLE รอเชื่อมต่อ</small>
+      </div>
+      <div class="acts">
+        <button type="button" id="btnBleConnect" class="ib" aria-label="เชื่อมต่อ BLE">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+            <path d="M7 7L17 17L12 22V2L17 7L7 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+          <span id="bleConnectLbl">เชื่อมต่อ BLE</span>
+        </button>
+        <button type="button" id="btnBleDisconnect" class="ib ble-disc" aria-label="ตัดการเชื่อมต่อ BLE" style="display:none">ตัด BLE</button>
+        <button type="button" class="ib themeBtn" aria-label="สลับธีมสว่างหรือมืด"></button>
+      </div>
+    </header>
+
+    <!-- หน้าปัดแสดงสถานะหลัก -->
+    <section class="hero" id="hero" data-s="open" aria-live="polite">
+      <div class="dial" id="dial" aria-hidden="true">
+        <svg id="dialSvgAlarm" class="key-svg" style="display:none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2V4M4.93 4.93L6.34 6.34M19.07 4.93L17.66 6.34" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M7 14C7 11.2386 9.23858 9 12 9C14.7614 9 17 11.2386 17 14V18H7V14Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round" />
+          <path d="M5 18H19" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <svg id="dialSvgArmed" class="key-svg" style="display:none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="11" width="11" height="9" rx="2.2" stroke="currentColor" stroke-width="1.8" />
+          <path d="M7.5 11V7.8C7.5 5.81177 8.84315 4.5 10.5 4.5C12.1569 4.5 13.5 5.81177 13.5 7.8V11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <path d="M18.5 12.2C19.6 13.3 19.6 15.1 18.5 16.2" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+        </svg>
+        <svg id="dialSvgUnlocked" class="key-svg" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="6" y="11" width="12" height="9" rx="2.2" stroke="currentColor" stroke-width="1.8" />
+          <path d="M8.5 11V7.6C8.5 5.6 9.9 4.3 11.8 4.3C13.4 4.3 14.7 5.2 15 6.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" />
+          <circle cx="12" cy="15.5" r="1.2" fill="currentColor" />
+        </svg>
+      </div>
+      <div>
+        <small>ระบบกันขโมย</small>
+        <h2 id="lockTxt">ปลดล็อก</h2>
+        <p>เซสชันเหลือ <b id="sess">05:00</b></p>
+      </div>
+    </section>
+
+    <!-- การ์ดสถานะย่อย 3 ช่อง -->
+    <div class="tiles">
+      <div class="tile" id="tSig" data-s="ok">
+        <span>สัญญาณ</span>
+        <b id="alarmTxt">
+          <span id="alarmIcon" class="lamp-ico" aria-hidden="true">
+            <svg id="icoAlarmOn" style="display:none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3V5M5.5 6.5L7 8M18.5 6.5L17 8" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+              <path d="M7.5 14.5C7.5 12 9.5 10 12 10C14.5 10 16.5 12 16.5 14.5V18H7.5V14.5Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              <path d="M5.5 18H18.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <svg id="icoAlarmOk" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M12 3L4.5 6.3V11.8C4.5 16.5 7.7 20.8 12 22C16.3 20.8 19.5 16.5 19.5 11.8V6.3L12 3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              <path d="M8.8 12.2L11 14.4L15.4 9.8" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span id="alarmLabel">ปกติ</span>
+        </b>
+      </div>
+
+      <div class="tile" id="tDoor" data-s="ok">
+        <span>ประตู</span>
+        <b id="doorTxt">
+          <span id="doorIcon" class="lamp-ico" aria-hidden="true">
+            <svg id="icoDoorOpen" style="display:none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M5 4L14 6.5V20L5 18V4Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              <path d="M14 6.5H18V18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M20.5 9.5V13.5M20.5 16.5V16.6" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <svg id="icoDoorClosed" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="6" y="3.5" width="12" height="17" rx="2" stroke="currentColor" stroke-width="2" />
+              <circle cx="15.2" cy="12.2" r="1.2" fill="currentColor" />
+            </svg>
+          </span>
+          <span id="doorLabel">ปิดสนิท</span>
+        </b>
+      </div>
+
+      <div class="tile" id="tEng" data-s="ok">
+        <span>เครื่องยนต์</span>
+        <b id="engTxt">
+          <span id="engIcon" class="lamp-ico" aria-hidden="true">
+            <svg id="icoEngOn" style="display:none" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 10H16V17H7V10Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              <path d="M10 10V7.5H13V10M4 12.5H7M16 12.5H18.5L20 14V16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+              <path d="M20.5 4.5L19 7H21.5L20 9.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <svg id="icoEngOff" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 10H16V17H7V10Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round" />
+              <path d="M10 10V7.5H13V10M4 12.5H7M16 12.5H18.5L20 14V16.5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          </span>
+          <span id="engLabel">ดับเครื่อง</span>
+        </b>
+      </div>
+    </div>
+
+    <!-- แท็บเลือกหมวดการตั้งค่า -->
+    <nav class="tabs">
+      <div class="seg" id="seg" role="tablist"></div>
+    </nav>
+
+    <!-- ฟอร์มการตั้งค่าทั้งหมด -->
+    <form id="f" action="/save" method="POST" novalidate>
+      <section class="pn" id="p0"></section>
+      <section class="pn" id="p1"></section>
+      <section class="pn" id="p2"></section>
+      <section class="pn" id="p3">
+        <div class="g">
+          <h3>รหัส PIN สำหรับ BLE</h3>
+          <div class="f">
+            <label for="pinInput">รหัส PIN ปัจจุบัน</label>
+            <input class="in" id="pinInput" name="pinInput" type="password" maxlength="12" value="123456" autocomplete="current-password">
+          </div>
+          <div class="f">
+            <label for="newPinInput">รหัส PIN ใหม่</label>
+            <input class="in" id="newPinInput" name="newPinInput" type="password" maxlength="12" minlength="4" placeholder="กรอกเพื่อเปลี่ยน (4-12 หลัก)" autocomplete="new-password">
+            <div style="margin-top:10px">
+              <button type="button" class="btn s" id="btnUpdatePin">อัปเดต PIN</button>
+            </div>
+          </div>
+        </div>
+        <button type="button" class="btn d" id="resetBtn">คืนค่าเริ่มต้นโรงงาน (ไม่รีเซ็ต PIN)</button>
+      </section>
+    </form>
+
+    <p class="foot">Isuzu D-Max<br>ESP32-C3 SuperMini</p>
+  </main>
+
+  <!-- แถบแจ้งเตือนเมื่อมีการแก้ไขข้อมูล -->
+  <div class="bar" id="bar">
+    <div>
+      <span id="cnt"></span>
+      <button type="button" class="btn s" id="undo">ยกเลิก</button>
+      <button type="submit" class="btn" form="f">บันทึกลง Flash</button>
+    </div>
+  </div>
+
+  <!-- หน้าต่างยืนยันรหัส PIN ก่อนเชื่อมต่อ BLE -->
+  <div id="pinModal" class="mb" role="dialog" aria-modal="true" aria-labelledby="pmT">
+    <div class="mbox">
+      <div style="font-size:30px">🔐</div>
+      <h3 id="pmT">ยืนยันรหัส PIN</h3>
+      <p>กรอกรหัส PIN สำหรับเชื่อมต่อและดึงค่าจาก ESP32-C3</p>
+      <div style="margin-top:14px;text-align:left">
+        <input class="in" id="modalPinInput" type="password" maxlength="12" minlength="4" placeholder="รหัส PIN (4-12 หลัก)" autocomplete="current-password">
+      </div>
+      <div class="mact">
+        <button type="button" id="pmNo">ยกเลิก</button>
+        <button type="button" id="pmYes" class="go">ยืนยัน</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- หน้าต่างยืนยันคืนค่าเริ่มต้นโรงงาน -->
+  <div id="resetModal" class="mb" role="dialog" aria-modal="true" aria-labelledby="rmT">
+    <div class="mbox">
+      <div style="font-size:30px">♻️</div>
+      <h3 id="rmT">คืนค่าเริ่มต้นโรงงาน?</h3>
+      <p>ค่าเวลา จังหวะ และจำนวนครั้งทั้งหมดจะกลับเป็นค่าเริ่มต้นโดยไม่รีเซ็ต PIN</p>
+      <form id="resetForm" action="/reset" method="POST" style="margin:0">
+        <div class="mact">
+          <button type="button" id="rmNo">ยกเลิก</button>
+          <button type="submit" id="rmYes" class="go">คืนค่า</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // สคริปต์จัดการธีมสว่าง/มืด
+    (function () {
+      const TK = "dmax_ui_theme";
+      const root = document.documentElement;
+      const tb = document.querySelectorAll(".themeBtn");
+      const mediaQuery = window.matchMedia ? window.matchMedia("(prefers-color-scheme: dark)") : null;
+
+      function dark() {
+        const a = root.getAttribute("data-theme");
+        return a ? a === "dark" : Boolean(mediaQuery && mediaQuery.matches);
+      }
+
+      function lbl() {
+        const d = dark();
+        tb.forEach(function (b) {
+          b.textContent = d ? "☀️ สว่าง" : "🌙 มืด";
+        });
+      }
+
+      try {
+        const sv = localStorage.getItem(TK);
+        if (sv === "light" || sv === "dark") {
+          root.setAttribute("data-theme", sv);
+        }
+      } catch (_) {}
+
+      lbl();
+
+      tb.forEach(function (b) {
+        b.addEventListener("click", function () {
+          const n = dark() ? "light" : "dark";
+          root.setAttribute("data-theme", n);
+          try {
+            localStorage.setItem(TK, n);
+          } catch (_) {}
+          lbl();
+        });
+      });
+
+      if (mediaQuery) {
+        mediaQuery.addEventListener("change", function () {
+          if (!root.getAttribute("data-theme")) {
+            lbl();
+          }
+        });
+      }
+    })();
+  </script>
+
+  <script>
+    // สคริปต์หลักสำหรับแท็บ ฟอร์ม โมดอล และสื่อสาร Web Bluetooth GATT กับ ESP32-C3 SuperMini
+    (function () {
+      "use strict";
+
+      const SERVICE_UUID = "4fafc201-1fb5-459e-8fcc-c5c9c331914b";
+      const CHAR_STATUS_UUID = "beb5483e-36e1-4688-b7f5-ea07361b26a8";
+      const CHAR_CONFIG_UUID = "cba1d466-344c-4be3-ab3f-189f80dd7518";
+      const DEVICE_NAME_FILTER = "Isuzu-DMax-BLE";
+      const CHUNK_LIMIT = 180;
+
+      const $ = function (s) {
+        return document.querySelector(s);
+      };
+
+      const T = [
+        ["alarmTime", "เสียงกันขโมยดังต่อเนื่อง", 3, 120, 1, 25, "วินาที"],
+        ["doorDelay", "เปิดประตูค้างก่อนเตือน", 1, 60, 1, 30, "วินาที"],
+        ["doorInt", "เตือนเปิดประตูซ้ำทุก", 1, 30, 1, 15, "วินาที"],
+        ["lockDelay", "หน่วงเสียงล็อก/ปลดล็อก", 0, 5, 0.1, 0.8, "วินาที"],
+        ["engDelay", "หน่วงเสียงสตาร์ทชุด 2", 0, 10, 0.1, 1.5, "วินาที"],
+        ["engLoopStartDelay", "หน่วงก่อนไฟกระพริบต่อเนื่อง", 0, 10, 0.1, 1, "วินาที"],
+        ["engLoopTime", "ระยะเวลาไฟเลี้ยวต่อเนื่อง", 0, 3600, 1, 15, "วินาที", "ใส่ 0 เพื่อไม่จำกัดเวลา"],
+        ["debounce", "เวลาหน่วงกรองสัญญาณปุ่ม/ประตู/เครื่องยนต์", 10, 500, 5, 30, "ms"]
+      ];
+
+      const S = [
+        ["alarmOn", "กันขโมย: ดัง", 30, 2000, 10, 200, "ms"],
+        ["alarmOff", "กันขโมย: เงียบ", 30, 2000, 10, 300, "ms"],
+        ["beepOn", "จังหวะดังต่อครั้ง", 20, 1000, 5, 100, "ms"],
+        ["beepOff", "จังหวะเว้นต่อครั้ง", 20, 1000, 5, 80, "ms"],
+        ["turnOn", "ไฟเลี้ยวทั่วไป: ติด", 30, 2000, 10, 200, "ms"],
+        ["turnOff", "ไฟเลี้ยวทั่วไป: เว้น", 30, 2000, 10, 150, "ms"],
+        ["engLoopOn", "สตาร์ทหลังบี๊บ 3 ครั้ง: ไฟติด", 30, 2000, 10, 200, "ms"],
+        ["engLoopOff", "สตาร์ทหลังบี๊บ 3 ครั้ง: ไฟดับ", 50, 5000, 50, 1000, "ms"]
+      ];
+
+      const C = [
+        ["cntLock", "ล็อกรถ", 0, 20, 1, 1, "ครั้ง"],
+        ["cntUnlock", "ปลดล็อกรถ", 0, 20, 1, 2, "ครั้ง"],
+        ["cntDoorW", "เตือนเปิดประตูค้าง", 0, 20, 1, 2, "ครั้ง"],
+        ["cntLockD", "ล็อกตอนประตูเปิด", 0, 20, 1, 4, "ครั้ง"],
+        ["cntClsEng", "ปิดประตูตอนติดเครื่อง", 0, 20, 1, 3, "ครั้ง"],
+        ["cntEng1st", "สตาร์ทตอนล็อก: ชุดแรก", 0, 20, 1, 1, "ครั้ง"],
+        ["cntEngSt", "สตาร์ทตอนล็อก: บี๊บชุด 2 ก่อนไฟเลี้ยวกระพริบ", 0, 20, 1, 3, "ครั้ง"]
+      ];
+
+      const SW = [
+        ["silentLock", "ล็อกแบบเงียบ", 0, "ตัดเสียงเตือนตอนล็อก/ปลดล็อก ไฟเลี้ยวยังติดได้"],
+        ["turnLock", "กระพริบไฟเลี้ยวตอนล็อกและปลดล็อก", 1],
+        ["turnAlarm", "กระพริบไฟเลี้ยวตอนเสียงกันขโมยดัง", 1],
+        ["turnEng", "กระพริบไฟเลี้ยวตอนสตาร์ทรถขณะล็อก", 1, "กระพริบพร้อมเสียงบี๊บชุดสตาร์ท และต่อเนื่องหลังหน่วงเวลาครบ"]
+      ];
+
+      const NUM_KEYS = T.concat(S, C).map(function (item) {
+        return item[0];
+      });
+      const BOOL_KEYS = SW.map(function (item) {
+        return item[0];
+      });
+
+      const PANELS = [
+        { n: "เวลา", g: [["เวลาและหน่วงเวลา", T]] },
+        { n: "เสียงและไฟ", g: [["ล็อกแบบเงียบและไฟเลี้ยว", SW, 1], ["จังหวะเสียงและไฟเลี้ยว", S]] },
+        { n: "จำนวนครั้ง", g: [["จำนวนครั้งแต่ละฟังก์ชัน (0–20)", C]] },
+        { n: "บัญชี" }
+      ];
+
+      function num(a) {
+        const desc = a[7] ? "<small>" + a[7] + "</small>" : "";
+        const inputMode = a[4] < 1 ? "decimal" : "numeric";
+        return (
+          '<div class="r"><div><b>' +
+          a[1] +
+          "</b>" +
+          desc +
+          '</div><div class="st"><button type="button" data-d="-1" aria-label="ลด">−</button><span class="v"><input type="number" id="' +
+          a[0] +
+          '" name="' +
+          a[0] +
+          '" aria-label="' +
+          a[1] +
+          '" min="' +
+          a[2] +
+          '" max="' +
+          a[3] +
+          '" step="' +
+          a[4] +
+          '" value="' +
+          a[5] +
+          '" required inputmode="' +
+          inputMode +
+          '"><u>' +
+          a[6] +
+          '</u></span><button type="button" data-d="1" aria-label="เพิ่ม">+</button></div></div>'
+        );
+      }
+
+      function sw(a) {
+        const desc = a[3] ? "<small>" + a[3] + "</small>" : "";
+        const checked = a[2] ? " checked" : "";
+        return (
+          '<label class="r"><div><b>' +
+          a[1] +
+          "</b>" +
+          desc +
+          '</div><span class="sw"><input type="checkbox" id="' +
+          a[0] +
+          '" name="' +
+          a[0] +
+          '" value="1"' +
+          checked +
+          "><i></i></span></label>"
+        );
+      }
+
+      const seg = $("#seg");
+      PANELS.forEach(function (p, i) {
+        seg.insertAdjacentHTML(
+          "beforeend",
+          '<button type="button" role="tab" aria-selected="false" data-t="' + i + '">' + p.n + "</button>"
+        );
+        if (p.g) {
+          $("#p" + i).innerHTML = p.g
+            .map(function (x) {
+              return '<div class="g"><h3>' + x[0] + "</h3>" + x[1].map(x[2] ? sw : num).join("") + "</div>";
+            })
+            .join("");
+        }
+      });
+
+      function tab(i) {
+        document.querySelectorAll(".pn").forEach(function (p, j) {
+          p.classList.toggle("on", j === i);
+        });
+        seg.querySelectorAll("button").forEach(function (b, j) {
+          b.setAttribute("aria-selected", String(j === i));
+        });
+      }
+
+      seg.addEventListener("click", function (e) {
+        const b = e.target.closest("[data-t]");
+        if (b) {
+          tab(Number(b.dataset.t));
+        }
+      });
+      tab(0);
+
+      // ระบบแสดง Toast แจ้งเตือนด้านบน
+      const toastEl = document.getElementById("toast");
+      const toastTxt = document.getElementById("toastText");
+      let toastTimer = null;
+
+      function showToast(m, err) {
+        if (!toastEl || !toastTxt) return;
+        toastTxt.textContent = m;
+        toastEl.classList.toggle("err", Boolean(err));
+        toastEl.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          toastEl.classList.remove("show");
+        }, 2600);
+      }
+
+      // การจัดการฟอร์ม ปุ่ม +/- และแถบยืนยันเมื่อมีการแก้ไข
+      const f = $("#f");
+      const els = function () {
+        return Array.prototype.slice.call(f.elements).filter(function (e) {
+          return e.name;
+        });
+      };
+      const val = function (e) {
+        return e.type === "checkbox" ? e.checked : e.value;
+      };
+
+      let init = {};
+      function snap() {
+        init = {};
+        els().forEach(function (e) {
+          init[e.name] = val(e);
+        });
+      }
+
+      function dirty() {
+        const n = els().filter(function (e) {
+          if (e.name === "newPinInput" || e.name === "pinInput") {
+            return false;
+          }
+          return init[e.name] !== val(e);
+        }).length;
+        $("#cnt").textContent = n ? "แก้ไขแล้ว " + n + " ค่า" : "";
+        $("#bar").classList.toggle("on", n > 0);
+      }
+
+      snap();
+      f.addEventListener("input", dirty);
+      f.addEventListener("change", dirty);
+
+      f.addEventListener("click", function (e) {
+        const b = e.target.closest("[data-d]");
+        if (!b) return;
+        const inp = b.parentNode.querySelector("input");
+        if (!inp) return;
+        const dp = (inp.step.split(".")[1] || "").length;
+        let v = (parseFloat(inp.value) || 0) + Number(b.dataset.d) * (Number(inp.step) || 1);
+        v = Math.min(Number(inp.max), Math.max(Number(inp.min), v));
+        inp.value = v.toFixed(dp);
+        dirty();
+      });
+
+      function collectConfigPayload() {
+        const payload = {};
+        NUM_KEYS.forEach(function (k) {
+          const input = document.getElementById(k);
+          if (input) {
+            payload[k] = Number(input.value);
+          }
+        });
+        BOOL_KEYS.forEach(function (k) {
+          const input = document.getElementById(k);
+          if (input) {
+            payload[k] = Boolean(input.checked);
+          }
+        });
+        return payload;
+      }
+
+      function applyConfigToForm(cfg) {
+        if (!cfg || typeof cfg !== "object") return;
+        NUM_KEYS.forEach(function (k) {
+          const input = document.getElementById(k);
+          if (input && typeof cfg[k] !== "undefined" && cfg[k] !== null) {
+            const dp = (input.step.split(".")[1] || "").length;
+            const numVal = Number(cfg[k]);
+            if (!Number.isNaN(numVal)) {
+              input.value = dp > 0 ? numVal.toFixed(dp) : String(numVal);
+            }
+          }
+        });
+        BOOL_KEYS.forEach(function (k) {
+          const input = document.getElementById(k);
+          if (input && typeof cfg[k] !== "undefined") {
+            input.checked = Boolean(cfg[k]);
+          }
+        });
+        snap();
+        dirty();
+      }
+
+      // สถานะและการสื่อสาร Web Bluetooth GATT
+      let bleDevice = null;
+      let statusChar = null;
+      let configChar = null;
+      let rxBuffer = "";
+      let bleConnected = false;
+      let suppressConfigToast = false;
+      let pinPromptResolve = null;
+
+      const btnBleConnect = $("#btnBleConnect");
+      const btnBleDisconnect = $("#btnBleDisconnect");
+      const bleConnectLbl = $("#bleConnectLbl");
+      const userEl = $("#user");
+      const bleSubtitle = $("#bleSubtitle");
+      const pinModal = $("#pinModal");
+      const modalPinInput = $("#modalPinInput");
+      const pmNo = $("#pmNo");
+      const pmYes = $("#pmYes");
+
+      function promptPinForBle() {
+        const pinEl = $("#pinInput");
+        if (!pinModal || !modalPinInput) {
+          return Promise.resolve(pinEl ? pinEl.value.trim() : "123456");
+        }
+        return new Promise(function (resolve) {
+          pinPromptResolve = resolve;
+          modalPinInput.value = pinEl ? pinEl.value.trim() : "";
+          pinModal.classList.add("open");
+          setTimeout(function () {
+            modalPinInput.focus();
+          }, 40);
+        });
+      }
+
+      function closePinModal(confirmed) {
+        const pinEl = $("#pinInput");
+        if (pinModal) {
+          pinModal.classList.remove("open");
+        }
+        const resolver = pinPromptResolve;
+        pinPromptResolve = null;
+        if (!resolver) return;
+
+        if (!confirmed) {
+          resolver(null);
+          return;
+        }
+        const entered = modalPinInput ? modalPinInput.value.trim() : "";
+        if (entered.length < 4 || entered.length > 12) {
+          showToast("รหัส PIN ต้องมี 4–12 ตัวอักษร", true);
+          resolver(null);
+          return;
+        }
+        if (pinEl) {
+          pinEl.value = entered;
+        }
+        resolver(entered);
+      }
+
+      if (pmNo) {
+        pmNo.addEventListener("click", function () {
+          closePinModal(false);
+        });
+      }
+      if (pmYes) {
+        pmYes.addEventListener("click", function () {
+          closePinModal(true);
+        });
+      }
+      if (modalPinInput) {
+        modalPinInput.addEventListener("keydown", function (e) {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            closePinModal(true);
+          } else if (e.key === "Escape") {
+            e.preventDefault();
+            closePinModal(false);
+          }
+        });
+      }
+      if (pinModal) {
+        pinModal.addEventListener("click", function (e) {
+          if (e.target === pinModal) {
+            closePinModal(false);
+          }
+        });
+      }
+
+      function updateBleHeaderUI() {
+        const name = bleDevice && bleDevice.name ? bleDevice.name : DEVICE_NAME_FILTER;
+        if (bleConnected) {
+          if (userEl) userEl.textContent = name;
+          if (bleSubtitle) {
+            bleSubtitle.innerHTML = 'เชื่อมต่อแล้ว · <b id="user">' + name + "</b>";
+          }
+          if (btnBleConnect) {
+            btnBleConnect.classList.add("ble-active");
+          }
+          if (bleConnectLbl) {
+            bleConnectLbl.textContent = "เชื่อมต่ออยู่";
+          }
+          if (btnBleDisconnect) {
+            btnBleDisconnect.style.display = "inline-flex";
+          }
+        } else {
+          if (bleSubtitle) {
+            bleSubtitle.innerHTML = 'ผู้ใช้ <b id="user">admin</b> · ' + (location.protocol === "file:" ? "โหมดไฟล์" : "BLE รอเชื่อมต่อ");
+          }
+          if (btnBleConnect) {
+            btnBleConnect.classList.remove("ble-active");
+          }
+          if (bleConnectLbl) {
+            bleConnectLbl.textContent = "เชื่อมต่อ BLE";
+          }
+          if (btnBleDisconnect) {
+            btnBleDisconnect.style.display = "none";
+          }
+        }
+      }
+
+      function handleIncomingJson(raw) {
+        let obj = null;
+        try {
+          obj = JSON.parse(raw);
+        } catch (_) {
+          return;
+        }
+        if (!obj || typeof obj !== "object") return;
+
+        if (typeof obj.locked !== "undefined") {
+          applyStatusData(obj);
+          return;
+        }
+
+        if (typeof obj.auth !== "undefined") {
+          if (obj.auth) {
+            const npEl = $("#newPinInput");
+            const pinEl = $("#pinInput");
+            if (obj.msg === "pin_updated" && npEl && npEl.value.trim()) {
+              if (pinEl) pinEl.value = npEl.value.trim();
+              npEl.value = "";
+            }
+            showToast("ยืนยัน PIN สำเร็จ: " + (obj.msg || "OK"), false);
+          } else {
+            const errMsg =
+              obj.error === "locked_out"
+                ? "ใส่ PIN ผิดเกินกำหนด รออีก " + (obj.retrySec || 60) + " วินาที"
+                : obj.msg || "รหัส PIN ไม่ถูกต้อง";
+            showToast(errMsg, true);
+          }
+          return;
+        }
+
+        if (typeof obj.alarmTime !== "undefined" || typeof obj.debounce !== "undefined") {
+          applyConfigToForm(obj);
+          if (!suppressConfigToast) {
+            showToast("ซิงก์ค่าการตั้งค่าจาก ESP32 แล้ว", false);
+          }
+        }
+      }
+
+      function feedBleChunk(chunkText) {
+        rxBuffer += chunkText;
+        const start = rxBuffer.indexOf("{");
+        if (start < 0) return;
+        let depth = 0;
+        let inStr = false;
+        let esc = false;
+        for (let i = start; i < rxBuffer.length; i++) {
+          const ch = rxBuffer[i];
+          if (esc) {
+            esc = false;
+            continue;
+          }
+          if (ch === "\\") {
+            esc = true;
+            continue;
+          }
+          if (ch === '"') {
+            inStr = !inStr;
+            continue;
+          }
+          if (inStr) continue;
+          if (ch === "{") {
+            depth++;
+          } else if (ch === "}") {
+            depth--;
+            if (depth === 0) {
+              const jsonStr = rxBuffer.slice(start, i + 1);
+              rxBuffer = rxBuffer.slice(i + 1);
+              handleIncomingJson(jsonStr);
+              feedBleChunk("");
+              return;
+            }
+          }
+        }
+      }
+
+      async function sendBleConfig(payloadObj) {
+        if (!bleConnected || !configChar) {
+          throw new Error("ยังไม่ได้เชื่อมต่อ BLE กับ ESP32-C3");
+        }
+        const pinEl = $("#pinInput");
+        const pin = pinEl ? pinEl.value.trim() : "123456";
+        const body = Object.assign({ pin: pin }, payloadObj);
+        const encoded = new TextEncoder().encode(JSON.stringify(body));
+
+        for (let offset = 0; offset < encoded.length; offset += CHUNK_LIMIT) {
+          const slice = encoded.slice(offset, offset + CHUNK_LIMIT);
+          if (typeof configChar.writeValueWithoutResponse === "function") {
+            await configChar.writeValueWithoutResponse(slice);
+          } else {
+            await configChar.writeValue(slice);
+          }
+        }
+      }
+
+      async function connectBle() {
+        const verifiedPin = await promptPinForBle();
+        if (!verifiedPin) return;
+
+        if (!navigator.bluetooth) {
+          showToast("เบราว์เซอร์นี้ไม่รองรับ Web Bluetooth", true);
+          updateBleHeaderUI();
+          return;
+        }
+        try {
+          bleDevice = await navigator.bluetooth.requestDevice({
+            filters: [{ name: DEVICE_NAME_FILTER }],
+            optionalServices: [SERVICE_UUID]
+          });
+
+          bleDevice.addEventListener("gattserverdisconnected", function () {
+            bleConnected = false;
+            statusChar = null;
+            configChar = null;
+            updateBleHeaderUI();
+            showToast("ตัดการเชื่อมต่อ BLE แล้ว", true);
+          });
+
+          const server = await bleDevice.gatt.connect();
+          const service = await server.getPrimaryService(SERVICE_UUID);
+
+          statusChar = await service.getCharacteristic(CHAR_STATUS_UUID);
+          configChar = await service.getCharacteristic(CHAR_CONFIG_UUID);
+
+          await statusChar.startNotifications();
+          statusChar.addEventListener("characteristicvaluechanged", function (ev) {
+            feedBleChunk(new TextDecoder().decode(ev.target.value));
+          });
+
+          await configChar.startNotifications();
+          configChar.addEventListener("characteristicvaluechanged", function (ev) {
+            feedBleChunk(new TextDecoder().decode(ev.target.value));
+          });
+
+          const initStatus = await statusChar.readValue();
+          feedBleChunk(new TextDecoder().decode(initStatus));
+
+          bleConnected = true;
+          updateBleHeaderUI();
+
+          suppressConfigToast = true;
+          try {
+            try {
+              const cachedCfg = await configChar.readValue();
+              const cachedText = new TextDecoder().decode(cachedCfg);
+              if (cachedText && cachedText.trim().startsWith("{")) {
+                feedBleChunk(cachedText);
+              }
+            } catch (_) {}
+            await sendBleConfig({ cmd: "get" });
+          } catch (_) {} finally {
+            setTimeout(function () {
+              suppressConfigToast = false;
+            }, 400);
+          }
+
+          showToast("เชื่อมต่อ " + (bleDevice.name || DEVICE_NAME_FILTER) + " และดึงค่าตั้งค่าแล้ว", false);
+        } catch (err) {
+          bleConnected = false;
+          updateBleHeaderUI();
+          showToast("เชื่อมต่อ BLE ไม่สำเร็จ: " + (err && err.message ? err.message : String(err)), true);
+        }
+      }
+
+      function disconnectBle() {
+        try {
+          if (bleDevice && bleDevice.gatt && bleDevice.gatt.connected) {
+            bleDevice.gatt.disconnect();
+          }
+        } catch (_) {}
+        bleConnected = false;
+        statusChar = null;
+        configChar = null;
+        updateBleHeaderUI();
+        showToast("ตัดการเชื่อมต่อ BLE แล้ว", false);
+      }
+
+      if (btnBleConnect) {
+        btnBleConnect.addEventListener("click", function () {
+          if (bleConnected) {
+            showToast("เชื่อมต่อ BLE อยู่แล้ว", false);
+          } else {
+            connectBle();
+          }
+        });
+      }
+
+      if (btnBleDisconnect) {
+        btnBleDisconnect.addEventListener("click", disconnectBle);
+      }
+
+      // ปุ่มอัปเดต PIN ในแท็บ บัญชี
+      const btnUpdatePin = $("#btnUpdatePin");
+      if (btnUpdatePin) {
+        btnUpdatePin.addEventListener("click", function () {
+          const npEl = $("#newPinInput");
+          const nextPin = npEl ? npEl.value.trim() : "";
+          if (nextPin.length < 4 || nextPin.length > 12) {
+            showToast("รหัส PIN ใหม่ต้องมี 4–12 ตัวอักษร", true);
+            if (npEl) npEl.focus();
+            return;
+          }
+
+          sendBleConfig({ newPin: nextPin })
+            .then(function () {
+              showToast("ส่งคำสั่งอัปเดต PIN ไปยัง ESP32 แล้ว", false);
+            })
+            .catch(function (err) {
+              showToast("ส่งรหัส PIN ไม่สำเร็จ: " + (err && err.message ? err.message : String(err)), true);
+            });
+        });
+      }
+
+      // ส่งค่าการตั้งค่าที่แก้ไข
+      f.addEventListener("submit", function (e) {
+        e.preventDefault();
+        const bad = els().find(function (x) {
+          return x.name !== "newPinInput" && x.name !== "pinInput" && !x.checkValidity();
+        });
+        if (bad) {
+          const pn = bad.closest(".pn");
+          if (pn) {
+            tab(Number(pn.id.slice(1)));
+          }
+          bad.focus();
+          showToast("ค่าที่กรอกอยู่นอกช่วงที่กำหนด กรุณาตรวจสอบอีกครั้ง", true);
+          return;
+        }
+
+        const payload = collectConfigPayload();
+        const npEl = $("#newPinInput");
+        const nextPin = npEl ? npEl.value.trim() : "";
+        if (nextPin.length >= 4 && nextPin.length <= 12) {
+          payload.newPin = nextPin;
+        }
+
+        sendBleConfig(payload)
+          .then(function () {
+            snap();
+            dirty();
+            showToast("บันทึกลง ESP32 Flash เรียบร้อยแล้ว", false);
+          })
+          .catch(function (err) {
+            showToast("บันทึกลง Flash ไม่สำเร็จ: " + (err && err.message ? err.message : String(err)), true);
+          });
+      });
+
+      $("#undo").onclick = function () {
+        els().forEach(function (x) {
+          if (x.name === "newPinInput") {
+            x.value = "";
+          } else if (x.type === "checkbox") {
+            x.checked = init[x.name];
+          } else {
+            x.value = init[x.name];
+          }
+        });
+        dirty();
+      };
+
+      // โมดอลยืนยันคืนค่าเริ่มต้นโรงงาน (ไม่รีเซ็ต PIN)
+      const rm = document.getElementById("resetModal");
+      const resetBtn = document.getElementById("resetBtn");
+      const rmNo = document.getElementById("rmNo");
+      const resetForm = document.getElementById("resetForm");
+
+      if (resetBtn && rm) {
+        resetBtn.addEventListener("click", function () {
+          rm.classList.add("open");
+        });
+      }
+      if (rmNo && rm) {
+        rmNo.addEventListener("click", function () {
+          rm.classList.remove("open");
+        });
+      }
+      if (rm) {
+        rm.addEventListener("click", function (e) {
+          if (e.target === rm) {
+            rm.classList.remove("open");
+          }
+        });
+      }
+      if (resetForm) {
+        resetForm.addEventListener("submit", function (e) {
+          e.preventDefault();
+          sendBleConfig({ cmd: "reset" })
+            .then(function () {
+              rm.classList.remove("open");
+              showToast("ส่งคำสั่งคืนค่าเริ่มต้นโรงงานแล้ว (รอรับค่าจาก ESP32)", false);
+            })
+            .catch(function (err) {
+              rm.classList.remove("open");
+              showToast("คืนค่าเริ่มต้นไม่สำเร็จ: " + (err && err.message ? err.message : String(err)), true);
+            });
+        });
+      }
+
+      // ตัวนับถอยหลังเซสชันและการอัปเดตสถานะระบบ
+      let rem = 300;
+      let lastSync = Date.now();
+      let prev = null;
+
+      function fmtSess() {
+        const elapsed = Math.floor((Date.now() - lastSync) / 1000);
+        const s = Math.max(0, rem - elapsed);
+        const el = document.getElementById("sess");
+        if (el) {
+          el.textContent = String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0");
+        }
+      }
+
+      setInterval(fmtSess, 1000);
+
+      function showEl(id, on) {
+        const el = document.getElementById(id);
+        if (el) {
+          el.style.display = on ? "" : "none";
+        }
+      }
+
+      function applyStatusData(d) {
+        if (!d) return;
+        if (typeof d.sessionRemainingSec === "number") {
+          rem = d.sessionRemainingSec;
+          lastSync = Date.now();
+          fmtSess();
+        }
+        if (
+          prev &&
+          prev.locked === d.locked &&
+          prev.doorOpen === d.doorOpen &&
+          prev.engineOn === d.engineOn &&
+          prev.alarmActive === d.alarmActive
+        ) {
+          return;
+        }
+
+        prev = {
+          locked: Boolean(d.locked),
+          doorOpen: Boolean(d.doorOpen),
+          engineOn: Boolean(d.engineOn),
+          alarmActive: Boolean(d.alarmActive)
+        };
+
+        const hero = $("#hero");
+        const lEl = $("#lockTxt");
+        if (hero) {
+          hero.dataset.s = prev.alarmActive ? "alarm" : prev.locked ? "armed" : "open";
+        }
+        if (lEl) {
+          lEl.textContent = prev.alarmActive ? "สัญญาณกันขโมยดัง" : prev.locked ? "ล็อกรถอยู่" : "ปลดล็อก";
+        }
+        showEl("dialSvgAlarm", prev.alarmActive);
+        showEl("dialSvgArmed", !prev.alarmActive && prev.locked);
+        showEl("dialSvgUnlocked", !prev.alarmActive && !prev.locked);
+
+        const tSig = $("#tSig");
+        const aLbl = $("#alarmLabel");
+        if (tSig) {
+          tSig.dataset.s = prev.alarmActive ? "bad" : "ok";
+        }
+        if (aLbl) {
+          aLbl.textContent = prev.alarmActive ? "กำลังดัง" : "ปกติ";
+        }
+        showEl("icoAlarmOn", prev.alarmActive);
+        showEl("icoAlarmOk", !prev.alarmActive);
+
+        const tDoor = $("#tDoor");
+        const dLbl = $("#doorLabel");
+        if (tDoor) {
+          tDoor.dataset.s = prev.doorOpen ? "warn" : "ok";
+        }
+        if (dLbl) {
+          dLbl.textContent = prev.doorOpen ? "เปิดอยู่" : "ปิดสนิท";
+        }
+        showEl("icoDoorOpen", prev.doorOpen);
+        showEl("icoDoorClosed", !prev.doorOpen);
+
+        const tEng = $("#tEng");
+        const eLbl = $("#engLabel");
+        if (tEng) {
+          tEng.dataset.s = prev.engineOn ? "warn" : "ok";
+        }
+        if (eLbl) {
+          eLbl.textContent = prev.engineOn ? "ติดเครื่อง" : "ดับเครื่อง";
+        }
+        showEl("icoEngOn", prev.engineOn);
+        showEl("icoEngOff", !prev.engineOn);
+      }
+
+      fmtSess();
+      updateBleHeaderUI();
+      applyStatusData({
+        locked: false,
+        doorOpen: false,
+        engineOn: false,
+        alarmActive: false,
+        sessionRemainingSec: rem
+      });
+    })();
+  </script>
+</body>
+</html>
